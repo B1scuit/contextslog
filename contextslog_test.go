@@ -32,3 +32,15 @@ func TestBasicContext(t *testing.T) {
 
 	happyPath.InfoContext(ctx, "Should include values")
 }
+
+func TestWithGroup(t *testing.T) {
+	happyPath.WithGroup("example").Info("Example group")
+}
+
+func TestBrokenContext(t *testing.T) {
+	ctx := context.WithValue(context.Background(), contextVal, "")
+
+	if l := GetFromContext(ctx); l != nil {
+		t.Error("should be nil")
+	}
+}
