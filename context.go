@@ -5,12 +5,17 @@ import (
 	"log/slog"
 )
 
+var (
+	contextType struct{}
+	contextVal  = contextType
+)
+
 func AddToContext(ctx context.Context, logger *slog.Logger, attrs ...any) context.Context {
-	return context.WithValue(ctx, ContextVal, logger.With(attrs...))
+	return context.WithValue(ctx, contextVal, logger.With(attrs...))
 }
 
 func GetFromContext(ctx context.Context) *slog.Logger {
-	h := ctx.Value(ContextVal)
+	h := ctx.Value(contextVal)
 
 	if h == nil {
 		return slog.Default()

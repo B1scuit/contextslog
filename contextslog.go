@@ -5,11 +5,6 @@ import (
 	"log/slog"
 )
 
-var (
-	contextType struct{}
-	ContextVal  = contextType
-)
-
 type Handler struct {
 	h slog.Handler
 
@@ -40,7 +35,6 @@ func (h *Handler) WithGroup(name string) slog.Handler {
 }
 
 func (h *Handler) Handle(ctx context.Context, r slog.Record) error {
-
 	if l := GetFromContext(ctx); l != nil {
 		// There was a logger in the context
 		if h, ok := l.Handler().(interface{ getAttrs() []slog.Attr }); ok {
