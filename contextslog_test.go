@@ -44,3 +44,18 @@ func TestBrokenContext(t *testing.T) {
 		t.Error("should be nil")
 	}
 }
+
+func ExampleNewContextHandler() {
+	logger := slog.New(NewContextHandler(
+		slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{}),
+	))
+
+	logger.Info("Hello World")
+}
+func ExampleNewContextHandler_as_default() {
+	slog.SetDefault(slog.New(NewContextHandler(
+		slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{}),
+	)))
+
+	slog.Info("Hello World")
+}
