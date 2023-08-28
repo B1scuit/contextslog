@@ -3,28 +3,40 @@ package contextslog
 import (
 	"context"
 	"log/slog"
+	"sync"
 )
 
+type contextType struct{ s string }
+
 var (
-	contextType struct{}
-	contextVal  = contextType
+	contextVal = contextType{"context"}
+	mutexVal   = contextType{"mutex"}
 )
 
 func AddToContext(ctx context.Context, logger *slog.Logger, attrs ...any) context.Context {
+	m, ok := ctx.Value(mutexVal).(*sync.RWMutex)
+	if !ok {
+		m = &sync.RWMutex{}
+		ctx = context.WithValue(ctx, mutexVal, m)
+	}
+
+	m.Lock()
+	defer m.Unlock()
+
 	return context.WithValue(ctx, contextVal, logger.With(attrs...))
 }
 
 func GetFromContext(ctx context.Context) *slog.Logger {
-	h := ctx.Value(contextVal)
+	m, mok := ctx.Value(mutexVal).(*sync.RWMutex)
+	h, hok := ctx.Value(contextVal).(*slog.Logger)
 
-	if h == nil {
-		return slog.Default()
+	if !hok || !mok {
+		ctx = AddToContext(ctx, slog.Default())
+		return GetFromContext(ctx)
 	}
 
-	if l, ok := h.(*slog.Logger); ok {
-		return l
-	}
+	m.RLock()
+	defer m.RUnlock()
 
-	slog.InfoContext(ctx, "type in context is %T not *slog.Logger", h)
-	return nil
+	return h
 }

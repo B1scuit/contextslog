@@ -37,14 +37,6 @@ func TestWithGroup(t *testing.T) {
 	happyPath.WithGroup("example").Info("Example group")
 }
 
-func TestBrokenContext(t *testing.T) {
-	ctx := context.WithValue(context.Background(), contextVal, "")
-
-	if l := GetFromContext(ctx); l != nil {
-		t.Error("should be nil")
-	}
-}
-
 func ExampleNewContextHandler() {
 	logger := slog.New(NewContextHandler(
 		slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{}),
